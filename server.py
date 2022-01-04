@@ -20,11 +20,9 @@ async def on_voice_state_update(member, before, after):
     if before.channel != None:
         voice = discord.utils.get(bot.voice_clients , channel__guild__id = before.channel.guild.id)
         if voice == None:
-            print("Voice is None")
             return
         
         if voice.channel.id != before.channel.id:
-            print("voice and after channelID != " )
             return
 
         if len(voice.channel.members) <= 1:
