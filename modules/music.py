@@ -7,11 +7,9 @@ import validators
 import youtube_dl
 import asyncio
 from youtubesearchpython import VideosSearch , Playlist
-import threading
 import base64
 import time
 import random
-import sqlite3
 import DiscordUtils
 
 """
@@ -19,8 +17,6 @@ import DiscordUtils
     When ANY ACTION is UNSUCCESSFUL, function will return False
 
 """
-
-con = sqlite3.connect('db.db')
 
 load_dotenv()
 SPOTIFY_TOKEN = os.getenv("SPOTIFY")
@@ -244,7 +240,7 @@ class Queue():
                 output += str((index + 1)) + ") " + track.title + "\n"
             
             index += 1
-            if index % 10 == 0:
+            if index % 20 == 0:
                 embeds.append(
                     discord.Embed(title="Queue" , description = output)
                 )
@@ -399,8 +395,6 @@ class MediaPlayer(commands.Cog):
                 id = query.split("/")[-1].split("?")[0]
                 singleTrack = True if "track" in query else False
                 tracks = await self._getURLFromSpotifyPlaylist( id , singleTrack=singleTrack )                 
-                
-                #TODO get youtube urls from the queies
 
             else: # its a youtube url  
 
@@ -436,7 +430,8 @@ class MediaPlayer(commands.Cog):
  
         # print("Provided URL" , urls)
         print("Current Track" , currentTrack)
-        if currentTrack.title == "" or currentTrack.url == "@unknownURL":
+        if ((currentTrack.title == "" or currentTrack.url == "@unknownURL") and currentTrack.isQuery == False):
+            print("Current Track")
             return
 
         if currentTrack.isQuery:

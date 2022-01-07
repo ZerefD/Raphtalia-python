@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 
 
@@ -9,7 +8,7 @@ class General(commands.Cog):
 
     @commands.command()
     async def greet(self , ctx):
-        await ctx.send("Hello " + ctx.author.username)
+        await ctx.send("Hello Discord!")
 
 def setup(client):
     client.add_cog(General(client))
