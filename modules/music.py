@@ -456,6 +456,27 @@ class MediaPlayer(commands.Cog):
         voice.play(player , after= lambda e: asyncio.run_coroutine_threadsafe(self.playNext(ctx , trackIndex=-1 , someError=e), self.client.loop))
         await send(ctx , title="Now Playing" , desc= currentTrack.title , img=currentTrack.img , color=discord.Colour.green())
 
+    # @commands.command(aliases=["seek"])
+    # async def seek(self, ctx , *args):
+    #     if len(args) != 1:
+    #         await send(ctx , title="Enter seek time in (seconds)")
+    #         return
+        
+    #     voice = self.getVoiceClient(ctx)
+    #     if not voice.is_playing():
+    #         await send(ctx , title="No Audio is being played")
+    #         return
+
+    #     currentTrack = self.queue.QUEUE[ctx.guild.id]["current"]
+
+    #     voice.stop()
+
+    #     self.ffmpeg_options["options"] = '-vn -ss ' + str(args[0])
+    #     player = discord.FFmpegPCMAudio(currentTrack.url , **self.ffmpeg_options)
+    #     self.ffmpeg_options["options"] = '-vn'
+    #     voice.play(player , after= lambda e: asyncio.run_coroutine_threadsafe(self.playNext(ctx , trackIndex=-1 , someError=e), self.client.loop))            
+    #     await send(ctx , title="Now Playing" , desc= currentTrack.title , img=currentTrack.img , color=discord.Colour.green())
+        
     async def _getYoutubeURLFromQueries(self, ctx , queries , isThread = False):
         tracks = []
         for query in queries:
@@ -495,6 +516,7 @@ class MediaPlayer(commands.Cog):
 
     async def _getURLFromSpotifyPlaylist(self, id , singleTrack=False):
         
+        offset = 0
         print("Spotify ID" , id)
         if id == None or len(id) == 0:
             return False
@@ -520,7 +542,8 @@ class MediaPlayer(commands.Cog):
         if singleTrack: 
             url = f"https://api.spotify.com/v1/tracks/{id}"
         else:
-            url = f"https://api.spotify.com/v1/playlists/{id}/tracks?fields=items(track(name%2Cartists(name)%2Calbum(name)))&limit=100&offset=0"
+            url = f"https://api.spotify.com/v1/playlists/{id}/tracks?fields=items(track(name%2Cartists(name)%2Calbum(name)))&limit=100&offset={offset}"
+            offset += 100
 
         headers = {"Authorization": "Bearer " + token}
         response = requests.get(url , headers=headers).json()
@@ -538,14 +561,20 @@ class MediaPlayer(commands.Cog):
             query = response["name"] + " " + artist
             tracks.append( TRACK(title=query , isQuery=True) )
         else:
-            for track in response["items"]:
-                artist = ""
-                if(len(track["track"]["artists"]) != 0):
-                    artist = track["track"]["artists"][0]["name"]
+            while(len(response["items"]) != 0):
                 
-                query = track["track"]["name"] + " " + artist
-        
-                tracks.append( TRACK(title=query , isQuery=True) )
+                for track in response["items"]:
+                    artist = ""
+                    if(len(track["track"]["artists"]) != 0):
+                        artist = track["track"]["artists"][0]["name"]
+                    
+                    query = track["track"]["name"] + " " + artist
+            
+                    tracks.append( TRACK(title=query , isQuery=True) )
+
+                url = f"https://api.spotify.com/v1/playlists/{id}/tracks?fields=items(track(name%2Cartists(name)%2Calbum(name)))&limit=100&offset={offset}"
+                offset += 100
+                response = requests.get(url , headers=headers).json()
 
         return tracks
 
@@ -732,6 +761,7 @@ class MediaPlayer(commands.Cog):
         paginator.add_reaction('🔐', "lock")
         paginator.add_reaction('⏩', "next")
         paginator.add_reaction('⏭️', "last")
+
         await paginator.run(data)
 
     async def checker(self, ctx , checkIfUserInVC = True):
@@ -761,30 +791,6 @@ class MediaPlayer(commands.Cog):
         self.queue.clearQueue(ctx.guild.id)
         await self.playNext(ctx)
 
-    
-    @commands.command()
-    async def paginate(self, ctx):
-        embedOne = discord.Embed(
-            title = "Page #1", #Any title will do
-            description = "This is page one!" #Any description will be fine
-        )
-        embedTwo = discord.Embed(
-            title = "Page #2",
-            description = "This is page two!"
-        )
-        embedThree = discord.Embed(
-            title = "Page #3",
-            description = "This is page three!"
-        )
-        paginationList = [embedOne, embedTwo, embedThree]
-        current = 0
-        paginator = DiscordUtils.Pagination.CustomEmbedPaginator(ctx)
-        paginator.add_reaction('⏮️', "first")
-        paginator.add_reaction('⏪', "back")
-        paginator.add_reaction('🔐', "lock")
-        paginator.add_reaction('⏩', "next")
-        paginator.add_reaction('⏭️', "last")
-        await paginator.run(paginationList)
 
 
 def setup(client):

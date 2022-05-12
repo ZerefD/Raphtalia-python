@@ -10,7 +10,7 @@ import time
 
 
 load_dotenv()
-SPOTIFY_PLAYLIST_ID = "0KpchpU9aWDi9NZW5rGcIt"
+SPOTIFY_PLAYLIST_ID = "4HU9MyPSDbjbUk8suzXyxU"
 
 
 ytdl_format_options = {
@@ -38,75 +38,76 @@ ffmpeg_options = {
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
   
-# def generateSpotifyAccessToken():
+def generateSpotifyAccessToken():
     
-#     s = os.getenv("SPOTIFY_CLIENT_ID") + ":" + os.getenv("SPOTIFY_CLIENT_SECRET")
+    s = os.getenv("SPOTIFY_CLIENT_ID") + ":" + os.getenv("SPOTIFY_CLIENT_SECRET")
         
-#     message_bytes = s.encode('ascii')
-#     base64_bytes = base64.b64encode(message_bytes)
-#     base64Message = base64_bytes.decode('ascii')
+    message_bytes = s.encode('ascii')
+    base64_bytes = base64.b64encode(message_bytes)
+    base64Message = base64_bytes.decode('ascii')
 
-#     headers = {
-#         'Content-Type' : 'application/x-www-form-urlencoded' , 
-#         'Authorization' : "Basic " + base64Message
-#     }
+    headers = {
+        'Content-Type' : 'application/x-www-form-urlencoded' , 
+        'Authorization' : "Basic " + base64Message
+    }
 
-#     data = {
-#         "grant_type" : "client_credentials"
-#     }
+    data = {
+        "grant_type" : "client_credentials"
+    }
 
-#     response = requests.post('https://accounts.spotify.com/api/token', data=data , headers=headers).json()
-#     print(response)
-#     if "error" in response:
-#         return True , response["error"]
-#     else:
-#         return False , response["access_token"]
+    response = requests.post('https://accounts.spotify.com/api/token', data=data , headers=headers).json()
+    print(response)
+    if "error" in response:
+        return True , response["error"]
+    else:
+        return False , response["access_token"]
 
-# def _getURLFromSpotifyPlaylist(id):
+def _getURLFromSpotifyPlaylist(id):
         
-#     print("Spotify ID" , id)
-#     if id == None or len(id) == 0:
-#         return False
+    print("Spotify ID" , id)
+    if id == None or len(id) == 0:
+        return False
 
         
-#     token = os.getenv("SPOTIFY_TOKEN")
-#     expiry = int(os.getenv("SPOTIFY_TOKEN_TIME"))
-#     rn = int(time.time())
-#     print("Token is " , token)
-#     if token == "" or len(token) < 2 or rn >= expiry:
-#         print("Running Token IF")
-#         error , token = generateSpotifyAccessToken()
-#         if error:
-#             print(token)
-#             return []
-#         os.environ["SPOTIFY_TOKEN"] = token
-#         os.environ["SPOTIFY_TOKEN_TIME"] = str(int(time.time()) + 3500)
+    token = os.getenv("SPOTIFY_TOKEN")
+    expiry = int(os.getenv("SPOTIFY_TOKEN_TIME"))
+    rn = int(time.time())
+    print("Token is " , token)
+    if token == "" or len(token) < 2 or rn >= expiry:
+        print("Running Token IF")
+        error , token = generateSpotifyAccessToken()
+        if error:
+            print(token)
+            return []
+        os.environ["SPOTIFY_TOKEN"] = token
+        os.environ["SPOTIFY_TOKEN_TIME"] = str(int(time.time()) + 3500)
         
 
-#     url = f"https://api.spotify.com/v1/playlists/{id}/tracks?fields=items(track(name%2Cartists(name)%2Calbum(name)))&limit=100&offset=0"
-#     headers = {"Authorization": "Bearer " + token}
-#     response = requests.get(url , headers=headers).json()
+    url = f"https://api.spotify.com/v1/playlists/{id}/tracks?fields=items(track(name%2Cartists(name)%2Calbum(name)))&limit=100&offset=200"
+    headers = {"Authorization": "Bearer " + token}
+    response = requests.get(url , headers=headers).json()
 
-#     if "error" in response:
-#         print("Spotify Error" , response)
-#         return []
+    if "error" in response:
+        print("Spotify Error" , response)
+        return []
 
-#     songsNotFound = ""
-#     songs = []
-#     for track in response["items"]:
-#         artist = ""
-#         if(len(track["track"]["artists"]) != 0):
-#             artist = track["track"]["artists"][0]["name"]
+    print("Response is" , response)
+    songsNotFound = ""
+    songs = []
+    for track in response["items"]:
+        artist = ""
+        if(len(track["track"]["artists"]) != 0):
+            artist = track["track"]["artists"][0]["name"]
             
-#         query = track["track"]["name"] + " " + artist
+        query = track["track"]["name"] + " " + artist
             
-#         songs.append({ "url" : "url" , "title" : query })
-#     return songs
+        songs.append({ "url" : "url" , "title" : query })
+    return songs
 
 
 
-# songs = _getURLFromSpotifyPlaylist(SPOTIFY_PLAYLIST_ID)
-
+songs = _getURLFromSpotifyPlaylist(SPOTIFY_PLAYLIST_ID)
+# print(songs)
 # for song in songs:
 #     res = VideosSearch(song["title"] , 1).result()["result"]
 #     if len(res) == 0:
@@ -117,7 +118,7 @@ ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 #         print("*" * 50 , "Downloaded " + song["title"] , "*" * 50 )
 
 
-ytdl.extract_info("https://www.youtube.com/watch?v=AwcI8WBhD9k" , download=True) 
+#ytdl.extract_info("https://www.youtube.com/watch?v=AwcI8WBhD9k" , download=True) 
 
 
 
