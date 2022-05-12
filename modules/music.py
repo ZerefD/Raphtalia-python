@@ -564,7 +564,7 @@ class MediaPlayer(commands.Cog):
             while(len(response["items"]) != 0):
                 
                 for track in response["items"]:
-                    artist = ""
+                    artist = "" # ok
                     if(len(track["track"]["artists"]) != 0):
                         artist = track["track"]["artists"][0]["name"]
                     
