@@ -308,14 +308,15 @@ class MediaPlayer(commands.Cog):
             return False
 
         try:
-            if len(self.client.voice_clients) == 0:
+            
+            voice = discord.utils.get(self.client.voice_clients , channel__guild__id = ctx.guild.id)
+            if voice == None:
                 await send(ctx , desc="No Active Voice Connections" , color=discord.Colour.red())
                 return False
 
-            for connection in self.client.voice_clients:
-                if ctx.guild.id == connection.channel.guild.id:
-                    await connection.disconnect()
-                    await send(ctx , desc="Disconnected from " + connection.channel.name , color=discord.Colour.green())
+            self.queue.clearQueue(ctx.guild.id)
+            await voice.disconnect()
+            await send(ctx , desc="Disconnected from " + voice.channel.name , color=discord.Colour.green())
 
         except Exception as ex:
             print(ex)
