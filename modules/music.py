@@ -322,6 +322,8 @@ class MediaPlayer(commands.Cog):
             print(ex)
             await send(ctx , desc="Unable to disconnect from the voice channel " + ctx.author.voice.channel.name + str(ex) , color=discord.Colour.red())
 
+    # returns list of TRACKS that consists of 
+    # playable youtube links by the ffmpeg 
     async def _downloadYoutubeVideo(self,tracks):
         loop = asyncio.get_event_loop()
         try:
@@ -424,7 +426,8 @@ class MediaPlayer(commands.Cog):
             await send(ctx , desc="URL Provided")
         else:
             # if its a search query search youtube.
-            tracks = await self._getYoutubeURLFromQueries(ctx,[query])
+            queries = query.split(",")
+            tracks = await self._getYoutubeURLFromQueries(ctx , queries)
         
         currentTrack , success = await self._addSongsToQueue(ctx , voice , tracks)
         if not success: return
@@ -448,6 +451,7 @@ class MediaPlayer(commands.Cog):
         if len(tracks) == 0:
             print("SONGS LENGTH IS ZERO")
             return False
+
         currentTrack = tracks[0]
         
         #t1 = threading.Thread(target=self._downloadYoutubeVideo, args=(url[1:],))
@@ -457,18 +461,22 @@ class MediaPlayer(commands.Cog):
         voice.play(player , after= lambda e: asyncio.run_coroutine_threadsafe(self.playNext(ctx , trackIndex=-1 , someError=e), self.client.loop))
         await send(ctx , title="Now Playing" , desc= currentTrack.title , img=currentTrack.img , color=discord.Colour.green())
 
-    # @commands.command(aliases=["seek"])
+    # @commands.command()
     # async def seek(self, ctx , *args):
     #     if len(args) != 1:
     #         await send(ctx , title="Enter seek time in (seconds)")
     #         return
         
-    #     voice = self.getVoiceClient(ctx)
+    #     voice = await self.getVoiceClient(ctx)
+    #     if not voice:
+    #         print("Voice is false in seek command")
+    #         return
+            
     #     if not voice.is_playing():
     #         await send(ctx , title="No Audio is being played")
     #         return
 
-    #     currentTrack = self.queue.QUEUE[ctx.guild.id]["current"]
+    #     currentTrack = self.queue.QUEUE[ctx.guild.id]["queue"][self.queue.QUEUE[ctx.guild.id]["current"]]
 
     #     voice.stop()
 
@@ -478,6 +486,7 @@ class MediaPlayer(commands.Cog):
     #     voice.play(player , after= lambda e: asyncio.run_coroutine_threadsafe(self.playNext(ctx , trackIndex=-1 , someError=e), self.client.loop))            
     #     await send(ctx , title="Now Playing" , desc= currentTrack.title , img=currentTrack.img , color=discord.Colour.green())
         
+    # Get youtube urls from search queries 
     async def _getYoutubeURLFromQueries(self, ctx , queries , isThread = False):
         tracks = []
         for query in queries:
@@ -496,7 +505,7 @@ class MediaPlayer(commands.Cog):
 
         return tracks
 
-
+    # get youtube urls from playlist link
     async def _getURLFromYTPlaylist(self, id):
         url = "https://www.youtube.com/playlist?list=" + id
         
@@ -514,7 +523,9 @@ class MediaPlayer(commands.Cog):
         return tracks , True , ""
 
 
-
+    # get song names from spotify track / playlist url
+    # this function returns list of TRACKS where each 
+    # track element is a query
     async def _getURLFromSpotifyPlaylist(self, id , singleTrack=False):
         
         offset = 0
