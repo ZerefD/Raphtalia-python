@@ -126,8 +126,16 @@ class Queue():
 
         return True , "Success"
 
+    def getCurrentlyPlayingTrack(self , guildID):
+        if guildID not in self.QUEUE:
+            return False , -1
 
-    def getSong(self , guildID , nextSong = True , trackIndex = -1):
+        index = self.QUEUE[guildID]["current"]
+        track = self.QUEUE[guildID]["queue"][index]
+
+        return track , index
+
+    def getSong(self , guildID , nextSong = True):
         if guildID not in self.QUEUE:
             return False
         
@@ -135,26 +143,34 @@ class Queue():
         newSongIndex = currentSongIndex
         loop = self.QUEUE[guildID]["loop"]
         repeat = self.QUEUE[guildID]["repeat"]
-        queue = self.QUEUE[guildID]["queue"]
-        queueSize = len(queue)
+        queueSize = len(self.QUEUE[guildID]["queue"])
 
         if queueSize == 0:
             return False
 
-        newSongIndex = newSongIndex + 1 if nextSong else newSongIndex - 1
-
-        if trackIndex != -1:
-            newSongIndex = trackIndex
-
-        if newSongIndex < 0:
-            newSongIndex = 0
-
-        elif newSongIndex >= queueSize:            
-            newSongIndex = 0 if loop else -1
-
+        # if repeat is on return currently playing song 
         if repeat:
             newSongIndex = currentSongIndex
-        elif newSongIndex == -1:
+            self.QUEUE[guildID]["current"] = newSongIndex
+            return self.QUEUE[guildID]["queue"][newSongIndex]
+
+
+
+        # play next song
+        if nextSong:
+            newSongIndex += 1
+
+            if newSongIndex >= queueSize:
+                newSongIndex = 0 if loop else -1
+        
+        # play previous song 
+        else:
+            newSongIndex -= 1
+            if newSongIndex < 0:
+                newSongIndex = 0
+
+        
+        if newSongIndex == -1:
             return False
         
         self.QUEUE[guildID]["current"] = newSongIndex
@@ -608,7 +624,7 @@ class MediaPlayer(commands.Cog):
             await send(ctx , desc="Stopping Playback")
             return
 
-        track = self.queue.getSong(ctx.guild.id , True , trackIndex)
+        track = self.queue.getSong(ctx.guild.id , True)
         print("New Track" , track)
         if track == False:
             await send(ctx , desc="Stopping playback. No more songs in the queue.")
