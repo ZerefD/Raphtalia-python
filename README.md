@@ -1,4 +1,6 @@
-# Raphtalia Python Music Bot
+# Due to changes to YouTube website, YTDL broke and doesnt work anymore as a result this bot is unable to retrieve data from YouTube. YTDL still havent updated their library to fix this issue, so when they do update the library I will make the necessary changes to this project.
+
+# Raphtalia Python Music Bot 
 Rahptalia is a Discord Music Bot. You can easily download and invite Raphtalia on your server to listen to high quality music with your friends.
 
 Raphtalia can play high quality songs from youtube.
