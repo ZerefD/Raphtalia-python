@@ -11,7 +11,7 @@ import time
 
 load_dotenv()
 SPOTIFY_PLAYLIST_ID = "4HU9MyPSDbjbUk8suzXyxU"
-
+# I added a new comment 
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -35,7 +35,7 @@ ffmpeg_options = {
     'options': '-vn'
 }
   
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+# ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
   
 def generateSpotifyAccessToken():

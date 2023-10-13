@@ -9,6 +9,9 @@ bot = commands.Bot(command_prefix = "!!")
 load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD")
 
+# added some more comments to 
+# teach my friend how to use github
+
 GUILD_VC_TIMER = {}
 
 @bot.event
