@@ -118,7 +118,7 @@ songs = _getURLFromSpotifyPlaylist(SPOTIFY_PLAYLIST_ID)
 #         print("*" * 50 , "Downloaded " + song["title"] , "*" * 50 )
 
 
-#ytdl.extract_3dfdainfo("FDSFSfdttps://www.youtube.com/watch?v=AwcI8WBhD9k" , download=True) 
+#ytdl.extract___info("https://www.youtube.com/watch?v=AwcI8WBhD9k" , download=True) 
 
 
 
